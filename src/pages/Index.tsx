@@ -13,6 +13,15 @@ interface User {
 	phone?: string;
 }
 
+type LoginResponse = {
+	access_token?: string;
+	nombre?: string;
+	name?: string;
+	email: string;
+	telefono?: string;
+	detail?: string;
+};
+
 const Index = () => {
 	const [authMode, setAuthMode] = useState<AuthMode>("login");
 	const [user, setUser] = useState<User | null>(null);
@@ -26,7 +35,13 @@ const Index = () => {
 				body: JSON.stringify({ email, password }),
 			});
 
-			const data = await response.json();
+			let data: LoginResponse;
+			const text = await response.text();
+			try {
+				data = JSON.parse(text) as LoginResponse;
+			} catch {
+				data = { detail: text, email };
+			}
 
 			if (!response.ok) {
 				toast({
