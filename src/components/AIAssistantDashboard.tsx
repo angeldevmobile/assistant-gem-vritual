@@ -377,10 +377,8 @@ export const AIAssistantDashboard = ({
 						timestamp: new Date(),
 					},
 				]);
-				if (data.audio) {
-					const audio = new Audio("data:audio/mp3;base64," + data.audio);
-					audio.play();
-				}
+				// Solo lee en voz alta la respuesta del asistente
+				speakText(data.text);
 				setInputMessage("");
 			} else {
 				console.warn("No se detectó voz o texto");
