@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ThemeToggle } from "./ThemeToggle";
+import emojiRegex from "emoji-regex";
 import BankIcon from "./BankIcon";
 import AIAssistantIcon from "./AIAssistantIcon";
 import {
@@ -162,11 +163,14 @@ export const AIAssistantDashboard = ({
 			setHistory([]);
 			return;
 		}
-		fetch(`https://assistant-virtual-production.onrender.com/api/v1/historial`, {
-			headers: {
-				Authorization: `Bearer ${token}`,
-			},
-		})
+		fetch(
+			`https://assistant-virtual-production.onrender.com/api/v1/historial`,
+			{
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			}
+		)
 			.then(async (res) => {
 				console.log("Status historial:", res.status); // Log del status HTTP
 				const data = await res.json().catch(() => null);
@@ -196,15 +200,18 @@ export const AIAssistantDashboard = ({
 		setInputMessage("");
 
 		try {
-			const response = await fetch("https://assistant-virtual-production.onrender.com/api/v1/assistant", {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({
-					question: inputMessage,
-					user_email: user.email,
-					document_id: uploadedDoc?.id,
-				}),
-			});
+			const response = await fetch(
+				"https://assistant-virtual-production.onrender.com/api/v1/assistant",
+				{
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({
+						question: inputMessage,
+						user_email: user.email,
+						document_id: uploadedDoc?.id,
+					}),
+				}
+			);
 
 			const data = await response.json();
 
@@ -295,11 +302,14 @@ export const AIAssistantDashboard = ({
 	// Cambia esta función para usar tu backend TTS (Google Cloud)
 	const speakText = async (text: string) => {
 		try {
-			const res = await fetch("https://assistant-virtual-production.onrender.com/api/v1/tts", {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ text }),
-			});
+			const res = await fetch(
+				"https://assistant-virtual-production.onrender.com/api/v1/tts",
+				{
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ text }),
+				}
+			);
 			const data = await res.json();
 			if (data.audio) {
 				const audio = new Audio("data:audio/mp3;base64," + data.audio);
@@ -378,12 +388,7 @@ export const AIAssistantDashboard = ({
 					},
 				]);
 				// Solo lee en voz alta la respuesta del asistente, pero sin emojis
-				const removeEmojis = (text: string) =>
-					text.replace(
-						/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F1E0}-\u{1F1FF}\u{2700}-\u{27BF}\u{24C2}-\u{1F251}]/gu,
-						""
-					);
-
+				const removeEmojis = (text: string) => text.replace(emojiRegex(), "");
 				speakText(removeEmojis(data.text));
 				setInputMessage("");
 			} else {
